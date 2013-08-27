@@ -20,7 +20,7 @@ func _rotate(str []byte,start,end int32) bool{
 	return true
 }
 
-func String_rotate(str string, m int32) string{
+func StringRotate(str string, m int32) string{
 	length := int32(len(str))
 	n := m % length
 	if n == 0 {
@@ -35,9 +35,10 @@ func String_rotate(str string, m int32) string{
 	return string(str_bytes)
 }
 
-/******************************
+/*****************************
 only rotate char
-字符串移动，其实是一系列序号之间的交换。
+字符串移动，其实是一系列序号
+之间的交换。
 ******************************/
 func _rotate_seq(str []byte,m int32) {
 	length := int32(len(str))
