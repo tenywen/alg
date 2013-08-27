@@ -28,3 +28,5 @@ func String_rotate(str string, m int32) string{
 	_rotate(str_bytes,0,length - 1)
 	return string(str_bytes)
 }
+
+
