@@ -14,6 +14,7 @@ func _random_partion(array []int32,start,end int32) int32 {
 	return common.Partion(array,start,end,p)
 }
 
+//---------- one method
 func RandomizedSelect(array []int32,start,end,k int32) []int32 {
 	length := int32(len(array))
 	pos := _random_partion(array,start,end)
@@ -26,4 +27,9 @@ func RandomizedSelect(array []int32,start,end,k int32) []int32 {
 		RandomizedSelect(array,start,pos - 1,k)
 	}
 	return array[start:start + k]
+}
+
+//---------- two method
+func HeapSelect(array []int32,k int32) {
+	heap := make([]int32,k)	
 }
