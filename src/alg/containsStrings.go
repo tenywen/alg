@@ -9,7 +9,16 @@ C = 7
 find的素数相乘，得到m
 src中的字母所代表的素数除m, m最后有剩余则不包含 
 ******************************/
+
+import (
+	"fmt"
+)
+
 func PrimeDivided(src ,find string) bool {
-	base := byte("a")	//假设所有字符都是小写
-	
+	find_bytes := []byte(find)
+	src_bytes := []byte(src)
+
+	base := byte('a')	//假设所有字符都是小写
+	fmt.Println(find_bytes,src_bytes,base)	
+	return true
 }
