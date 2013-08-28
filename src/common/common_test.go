@@ -38,6 +38,24 @@ func TestRandom(t *testing.T) {
 func TestBuildHeap(t *testing.T) {
 	m := []int32{10,12,18,1,2,4,9,99,10,17,23,33,79,68}
 	fmt.Println(m)
-	BuildHeap(m)
+	BuildHeap(m,"max")
 	fmt.Println(m)
+}
+
+func TestGetHeapRoot(t *testing.T) {
+	m := []int32{10,12,18,1,2,4,9,99,10,17,23,33,79,68}
+	BuildHeap(m,"max")
+	length := int32(len(m))
+	heapSize := length
+	for i := int32(0); i < length; i ++ {
+		fmt.Println(GetHeapRoot(m,"max",heapSize))
+		heapSize -= 1
+	}
+	fmt.Println("===================")
+	BuildHeap(m,"min")
+	heapSize = length
+	for i := int32(0); i < length; i ++ {
+		fmt.Println(GetHeapRoot(m,"min",heapSize))
+		heapSize -= 1
+	}
 }
