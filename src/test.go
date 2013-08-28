@@ -4,7 +4,6 @@ import (
 	"fmt"
 )
 
-
 func main() {
 	m := 3 
 	n := 4 

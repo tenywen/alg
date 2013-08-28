@@ -1,7 +1,5 @@
 package alg
-import (
-	"common"
-)
+
 /******************************
 only rotate char
 X="abc",X^T="cba"
@@ -9,6 +7,11 @@ X="abc",X^T="cba"
 2.(X^T Y^T)^T = YX(three rotate)
 3.return YX
 ******************************/
+
+import (
+	"common"
+)
+
 func _rotate(str []byte,start,end int32) bool{
 	i := start
 	j := end
