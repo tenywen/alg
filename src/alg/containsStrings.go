@@ -14,6 +14,7 @@ import (
 	"fmt"
 )
 
+//to doing
 func PrimeDivided(src ,find string) bool {
 	find_bytes := []byte(find)
 	src_bytes := []byte(src)
