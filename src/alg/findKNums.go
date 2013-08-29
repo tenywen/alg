@@ -31,5 +31,5 @@ func RandomizedSelect(array []int32,start,end,k int32) []int32 {
 
 //---------- two method
 func HeapSelect(array []int32,k int32) {
-	heap := make([]int32,k)	
+//	heap := make([]int32,k)	
 }
