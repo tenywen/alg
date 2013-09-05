@@ -41,7 +41,7 @@ func PrimeDivided(src ,find string) bool {
 		}
 	}
 	if find_prime_count != 1 {
-		return false	
+		return false
 	}
 	return true
 }
