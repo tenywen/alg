@@ -32,3 +32,9 @@ func TestPrimeDivided(t *testing.T) {
 	find := string("haj")
 	fmt.Println(PrimeDivided(src,find))
 }
+
+func TestMergeSort(t *testing.T) {
+	array := []int32{12,10,222,3,3,4,5,6,9,10,22,33,123,2545,545,12,754}
+	fmt.Println(array)
+	fmt.Println(MergeSort(array))
+}
