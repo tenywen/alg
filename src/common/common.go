@@ -1,10 +1,15 @@
 package common
 
 import (
-	"math"
+//	"math"
 	"math/rand"
 	"time"
 )
+var _r *rand.Rand
+
+func init() {
+	_r = rand.New(rand.NewSource(time.Now().Unix()))
+}
 
 //greatest common divisor
 //Euclidean algorithm
@@ -32,6 +37,7 @@ func JudgePrime(num uint64) bool {
 		return false
 	}
 	c := uint64(7)
+	m := num
 	m := uint64(math.Sqrt(float64(num)))
 	for ; c <= m ; {
 		if num % c == 0 {
@@ -96,14 +102,10 @@ func Partion(array []int32,start,end,pos int32) int32{
 }
 
 func Random(start,end int32) int32 {
-	if end < start {
-		return 0
-	}
 	if start == end {
 		return start
 	}
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-	return r.Int31() % (end - start) + 1 + start
+	return _r.Int31() % (end - start + 1) +  start
 }
 
 //modify min heap
