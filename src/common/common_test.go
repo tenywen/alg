@@ -18,7 +18,7 @@ func TestJudgePrime(t *testing.T) {
 	i := uint64(0)
 	for ; i < 100000; i ++ {
 		if	JudgePrime(i) ==  true {
-			c ++	
+			c ++
 		}
 		
 	}
