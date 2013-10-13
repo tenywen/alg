@@ -23,45 +23,63 @@ struct BTreeNode {
 	int			Color;	
 };
 
+struct BTreeHead {
+	BTreeNode* Next;	
+};
+
 typedef BTreeNode* PBTreeNode;
+typedef BTreeHead* PBTreeHead;
 
 #define _BTREE_PARENT(x) (x->Parent)
 #define _BTREE_LEFT(x) (x->Left)
 #define _BTREE_RIGHT(x) (x->Right)
+#define _BTREE_VALUE(x) (x->Value)
+#define _BTREE_COLOR(x) (x->Color)
+#define _SET_BTREE_HEAD(head,x) (head->Next = x)
+#define _IS_NIL(x) ((!x->Left && !x->Right)?true:false)
+#define _INIT_BTREE_HEAD(head) do\
+				{\
+					head->Next = NULL;\
+				}while(0)
 #define _INIT_BTREE_NODE(x) do\
 				{\
 					x->Left = NULL;\
 					x->Right = NULL;\
-					x-Color = RED;\
+					x->Color = BLACK;\
+					x->Value = 0;\
+					x->Parent = NULL;\
 				}while(0)
 // when y is x->right ,you can left rotate
-#define _LEFT_ROTATE(x,y) do\
+#define _LEFT_ROTATE(head,x,y) do\
 			{\
 				x->Right = y->Left;\
 				y->Left->Parent = x;\
 				y->Left = x;\
 				y->Parent = x->Parent;\
-				if(_BTREE_LEFT(_BTREE_PARENT(x)) == x) {\
+				if(_BTREE_PARENT(x) && _BTREE_LEFT(_BTREE_PARENT(x)) == x) \
 					x->Parent->Left = y;\
-				} else {\
+				else if(_BTREE_PARENT(x) && _BTREE_RIGHT(_BTREE_PARENT(x)) == x)\
 					x->Parent->Right = y;\
-				}\
+				else\
+					head->Next = y;\
 				x->Parent = y;\
 			}while(0)
 // when x is y->left , you can right rotate
-#define _RIGHT_ROTATE(y,x)	do\
+#define _RIGHT_ROTATE(head,y,x)	do\
 			{\
 				y->Left = x->Right;\
 				x->Right->Parent = y;\
 				x->Parent = y->Parent;\
-				if(_BTREE_LEFT(_BTREE_PARENT(y)) == y) {\
+				if(_BTREE_PARENT(x) && _BTREE_LEFT(_BTREE_PARENT(y)) == y) \
 					y->Parent->Left = x;\
-				} else {\
+				else if(_BTREE_PARENT(x) && _BTREE_RIGHT(_BTREE_PARENT(y)) == y)\
 					y->Parent->Right = x;\
-				}\
-				y->Parent = x;\
+				else\
+					head->Next = y;\
 			}while(0)
 
-extern PBTreeNode BTreeNew();
-extern PBTreeNode BTreeNIL(PBTreeNode p);
+extern PBTreeHead BTreeNew();
+extern int BTreeNIL(PBTreeNode p);
+extern int BTreeInsert(PBTreeNode root,PBTreeNode node);
+extern int BTreeMidTraverse(PBTreeNode root);
 #endif
