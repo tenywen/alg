@@ -11,107 +11,134 @@
 #include <stdio.h>
 #include "BTree.h"
 
+extern pBTreeNode NIL;
 // 调整红黑属性
-int _fixed(PBTreeHead head,PBTreeNode node) {
-	PBTreeNode z = node;
-	PBTreeNode parent = _BTREE_PARENT(node);
-	PBTreeNode gparent = NULL; 
-	PBTreeNode uncle = NULL;
-	while(parent && _BTREE_COLOR(parent) == RED) {
-		gparent = _BTREE_PARENT(parent);
-		if (!gparent) 
+int _insert_fixed(pBTreeHead head,pBTreeNode z) {
+	pBTreeNode uncle = NULL;
+	while(_BTREE_PARENT(z) != NIL && _BTREE_COLOR((_BTREE_PARENT(z))) == RED) {
+		if ((_BTREE_PARENT(_BTREE_PARENT(z))) == NIL) 
 			break;
-		if(parent == _BTREE_LEFT(gparent))
-			uncle = _BTREE_RIGHT(gparent);
+		if(_BTREE_PARENT(z) == _BTREE_LEFT(_BTREE_PARENT(_BTREE_PARENT(z))))
+			uncle = _BTREE_RIGHT(_BTREE_PARENT(_BTREE_PARENT(z)));
 		else 
-			uncle = _BTREE_LEFT(gparent);
+			uncle = _BTREE_LEFT(_BTREE_PARENT(_BTREE_PARENT(z)));
 		// 节点z的叔叔节点为红色，此为情况1:
 		// 将z的父节点和叔叔节点置为黑，z变更为祖父节点。重复while循环
 		if(_BTREE_COLOR(uncle) == RED) {
-			uncle->Color = BLACK;
-			parent->Color = BLACK;
-			gparent->Color = RED;
-			z = gparent;
-			parent = _BTREE_PARENT(z);
+			_SET_COLOR(uncle,BLACK);
+			_SET_COLOR(_BTREE_PARENT(z),BLACK);
+			_SET_COLOR(_BTREE_PARENT(_BTREE_PARENT(z)),RED);
+			z = _BTREE_PARENT(_BTREE_PARENT(z));	
 		} else {
 			// 节点z的叔叔节点为黑色，此为情况2，3:
-			if(z == _BTREE_RIGHT(parent)) {
-				_LEFT_ROTATE(head,parent,z);
+			if(z == _BTREE_RIGHT(_BTREE_PARENT(z))) {
+				// z上升一层
+				z = _BTREE_PARENT(z);	
+				_LEFT_ROTATE(head,z);
 			}
-			if(z == _BTREE_LEFT(gparent))
-				_RIGHT_ROTATE(head,gparent,z);
+			_SET_COLOR(_BTREE_PARENT(z),BLACK);
+			_SET_COLOR(_BTREE_PARENT(_BTREE_PARENT(z)),RED);
+			// 这里必须用一个变量x 来存储z的祖父节点，传递给下面的左转或者右转
+			// 否则左转或者右转的宏，会改变z->Parent
+			pBTreeNode x = _BTREE_PARENT(_BTREE_PARENT(z));
+			if(_BTREE_PARENT(z) == _BTREE_LEFT(_BTREE_PARENT(_BTREE_PARENT(z))))
+				_RIGHT_ROTATE(head,x);
 			else 
-				_LEFT_ROTATE(head,gparent,z);
-			z->Color = BLACK;
-			gparent->Color = RED;
+				_LEFT_ROTATE(head,x);
 		}
 	}
-	head->Next->Color = BLACK;
+	_SET_COLOR(head->Next,BLACK);
 }
 
-int BTreeNIL(PBTreeNode p) {
-	PBTreeNode left = (PBTreeNode)malloc(sizeof(BTreeNode));
-	PBTreeNode right = (PBTreeNode)malloc(sizeof(BTreeNode));
-	if (!left || !right)
-		return NULL;
-	_INIT_BTREE_NODE(left);	
-	_INIT_BTREE_NODE(right);	
-	p->Left = left;
-	p->Right = right;
-	left->Parent = p;
-	right->Parent = p;
-	return 0; 
+// return min node when root is node
+pBTreeNode BTreeMin(pBTreeNode node) {
+	pBTreeNode left = _BTREE_LEFT(node);
+	pBTreeNode min = node;
+	while(left && !_IS_NIL(left)) {
+		min = left;
+		left = _BTREE_LEFT(left);
+	}
+	return min;
 }
 
-PBTreeNode BTreeCreateNode(int value) {
-	PBTreeNode node = (PBTreeNode)malloc(sizeof(BTreeNode));
-	if(!node)
-		return NULL;
-	_INIT_BTREE_NODE(node);
-	node->Value = value;
-	BTreeNIL(node);
-	return node;
+// return node succeed
+pBTreeNode BTreeSucceed(pBTreeNode node) {
+	pBTreeNode right = _BTREE_RIGHT(node);
+	pBTreeNode next = node;
+	pBTreeNode parent = _BTREE_PARENT(node);
+	if (right && !_IS_NIL(right)) {
+		return BTreeMin(right);	
+	}
+	while(parent && next == _BTREE_RIGHT(parent)) { 
+		next = parent;
+		parent = _BTREE_PARENT(next);	
+	}
+	return parent;
 }
 
-PBTreeHead BTreeNew() {
-	PBTreeHead head = (PBTreeHead)malloc(sizeof(PBTreeHead));
-	_INIT_BTREE_HEAD(head);
+pBTreeHead BTreeNew() {
+	pBTreeHead head = (pBTreeHead)malloc(sizeof(BTreeHead));
+	head->Next = NULL;
 	return head;
 }
 
-int BTreeInsert(PBTreeHead head,PBTreeNode node) {
-	PBTreeNode parent = NULL;
-	PBTreeNode next = head->Next;
-	if(!next) {
-		head->Next = node;
-		return 0;		
-	}
-	while(_IS_NIL(next) == false) {
-		parent = next;
+int BTreeInsert(pBTreeHead head,pBTreeNode node) {
+	pBTreeNode next = head->Next;
+	pBTreeNode y = NULL;
+	while(next != NULL) {
+		y = next;
 		if(_BTREE_VALUE(next) > _BTREE_VALUE(node))	
 			next = _BTREE_LEFT(next);
-		else 
+		else
 			next = _BTREE_RIGHT(next);
 	}
-	if (parent) {
-		if (_BTREE_VALUE(parent) > _BTREE_VALUE(node))
-			parent->Left = node;
-		else 
-			parent->Right = node;
-		node->Parent = parent;	
-	} 	
-	
+	if(y != NULL) {
+		if(_BTREE_VALUE(y) > _BTREE_VALUE(node))	
+			y->Left = node;
+		else
+			y->Right = node;
+		node->Parent = y;
+	} else {
+		head->Next = node;		
+	}
+	node->Left = NULL;
+	node->Right = NULL;
 	node->Color = RED;
-	_fixed(head,node);
-	free(next);
+	_insert_fixed(head,node);
 	return 0;
 }
 
-int BTreeMidTraverse(PBTreeNode node) {
-	if (!node) 
-		return 0;	
+int BTreeDel(pBTreeHead head, pBTreeNode node) {
+	pBTreeNode y = NIL;
+	pBTreeNode x = NIL;
+	if (_BTREE_LEFT(node) == NIL || _BTREE_RIGHT(node) == NIL)
+		y = node;
+	else 
+		y = BTreeSucceed(node);
+	
+	// y最多只有一个孩子节点(非NIL节点)
+	x = _BTREE_LEFT(y);
+	if (x == NIL)
+		x = _BTREE_RIGHT(y);
+	_BTREE_PARENT(x) = _BTREE_PARENT(y);
+	// y为root
+	if (y == head->Next)
+		head->Next = x;
+	else if (_BTREE_LEFT(y) == y)
+		_BTREE_LEFT(_BTREE_PARENT(y)) = x;
+	else
+		_BTREE_RIGHT(_BTREE_PARENT(y)) = x;
+	if (y != node)
+		_BTREE_VALUE(node) = _BTREE_VALUE(y);
+	
+	return 0;
+}
+
+int BTreeMidTraverse(pBTreeNode node) {
+	if (node == NIL) 
+		return 0;
 	BTreeMidTraverse(node->Left);
-	if (_IS_NIL(node) == false) {
+	if (node != NIL) {
 		printf("color : %d(1 = red,2 = black)\n",node->Color);
 		printf("value : %d\n",node->Value);
 	}
@@ -120,21 +147,25 @@ int BTreeMidTraverse(PBTreeNode node) {
 }
 
 int main() {
-	PBTreeHead head = BTreeNew();
-	PBTreeNode p1 = BTreeCreateNode(222);
+	pBTreeHead head = BTreeNew();
+	pBTreeNode p1 = (pBTreeNode)malloc(sizeof(BTreeNode));
+	p1->Value = 555;
 	BTreeInsert(head,p1);
-	BTreeMidTraverse(head->Next);
-	PBTreeNode p2 = BTreeCreateNode(333);
-	BTreeInsert(head,p2);
 	
-	BTreeMidTraverse(head->Next);
-	PBTreeNode p3 = BTreeCreateNode(444);
+	pBTreeNode p2 = (pBTreeNode)malloc(sizeof(BTreeNode));
+	p2->Value = 444;
+	BTreeInsert(head,p2);
+
+	pBTreeNode p3 = (pBTreeNode)malloc(sizeof(BTreeNode));
+	p3->Value = 666;
 	BTreeInsert(head,p3);
 
-	BTreeMidTraverse(head->Next);
-	PBTreeNode p4 = BTreeCreateNode(555);
+	pBTreeNode p4 = (pBTreeNode)malloc(sizeof(BTreeNode));
+	p4->Value = 333;
 	BTreeInsert(head,p4);
 
-	BTreeMidTraverse(head->Next);
+	pBTreeNode p5 = (pBTreeNode)malloc(sizeof(BTreeNode));
+	p5->Value = 222;
+	BTreeInsert(head,p5);
 	return 0;
 }
