@@ -12,7 +12,7 @@
 #include "BTree.h"
 
 extern pBTreeNode NIL;
-// 调整红黑属性
+// 调整插入后红黑属性
 int _insert_fixed(pBTreeHead head,pBTreeNode z) {
 	pBTreeNode uncle = NULL;
 	while(_BTREE_PARENT(z) != NIL && _BTREE_COLOR((_BTREE_PARENT(z))) == RED) {
@@ -48,6 +48,47 @@ int _insert_fixed(pBTreeHead head,pBTreeNode z) {
 		}
 	}
 	_SET_COLOR(head->Next,BLACK);
+}
+
+// 调整删除以后节点红黑属性
+int _del_fixed(pBTreeHead head, pBTreeNode x) {
+	while(x != NIL && _BTREE_COLOR(x) == BLACK) {
+		pBTreeNode w = _BTREE_LEFT(_BTREE_PARENT(x));
+		if (w == x)
+			w = _BTREE_RIGHT(_BTREE_PARENT(x));
+		// 1.如果x的兄弟节点w是红色.首先w节点的子节点肯定存在且均为黑。原因这里不叙述。
+		//   (只要明白从一个节点到它的每个叶子节点的黑高度相等)
+		if (_BTREE_COLOR(w) == RED) {
+			_SET_COLOR(w,BLACK);
+			_SET_COLOR(_BTREE_PARENT(w),RED);
+			if (w == _BTREE_RIGHT(_BTREE_PARENT(x)))
+				_LEFT_ROTATE(head,w);
+			else
+				_RIGHT_ROTATE(head,w);
+		} else if(_BTREE_COLOR(_BTREE_LEFT(w)) == BLACK && _BTREE_COLOR(_BTREE_RIGHT(w)) == BLACK) {
+			// 2.x的兄弟节点w是红色.
+			_SET_COLOR(w,RED);
+			x = _BTREE_PARENT(x);
+		} else if(_BTREE_COLOR(_BTREE_LEFT(w)) == RED && _BTREE_COLOR(_BTREE_RIGHT(w)) == BLACK) {
+			// 3.x的兄弟节点w是黑色,且w的左子为红，右子为黑
+			_SET_COLOR(w,RED);
+			_SET_COLOR(_BTREE_LEFT(w),BLACK);
+			_LEFT_ROTATE(head,w);
+		} else if(_BTREE_COLOR(_BTREE_RIGHT(w)) == RED) {
+			// 4.x的兄弟节点w是黑色，且右子为红色
+			pBTreeNode parent = _BTREE_PARENT(x);
+			_SET_COLOR(_BTREE_RIGHT(w),BLACK);
+			_SET_COLOR(w,_BTREE_COLOR(parent));
+			_SET_COLOR(parent,BLACK);
+			if (w == _BTREE_RIGHT(parent)) 
+				_LEFT_ROTATE(head,parent);
+			else 
+				_RIGHT_ROTATE(head,parent);
+			x = head->Next;
+		}
+	}
+	_SET_COLOR(x, BLACK);
+	return 0;	
 }
 
 // return min node when root is node
@@ -130,7 +171,9 @@ int BTreeDel(pBTreeHead head, pBTreeNode node) {
 		_BTREE_RIGHT(_BTREE_PARENT(y)) = x;
 	if (y != node)
 		_BTREE_VALUE(node) = _BTREE_VALUE(y);
-	
+	if (_BTREE_COLOR(y) == BLACK)
+		_del_fixed(head,x);
+	free(node);	
 	return 0;
 }
 
