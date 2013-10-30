@@ -1,5 +1,5 @@
 /*******************************************
-   
+  
    
    				@ Black Tree
 				@ int binary
@@ -11,14 +11,14 @@
 #define _BLACK_TREE_H_
 
 enum COLOR {
-	RED		=	1,
-	BLACK	=	2,		
+	RED		= 1,
+	BLACK	= 2,		
 };
 
 struct BTreeNode {
-	BTreeNode* 	Left;
-	BTreeNode* 	Right;
-	BTreeNode* 	Parent;
+	BTreeNode*	Left;
+	BTreeNode*	Right;
+	BTreeNode*	Parent;
 	int			Value;
 	int			Color;	
 };
