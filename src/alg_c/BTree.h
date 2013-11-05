@@ -1,9 +1,8 @@
 /*******************************************
-   
-   
-   				@ Black Tree
-				@ int binary
-				@ BlackTree.h
+ 
+      		@ Black Tree
+            @ int binary
+			@ BlackTree.h
 						
 
 ********************************************/
