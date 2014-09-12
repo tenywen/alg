@@ -4,8 +4,6 @@
    				@ Black Tree
 				@ int binary
 				@ BlackTree.h
-						
-
 ********************************************/
 #ifndef _BLACK_TREE_H_
 #define _BLACK_TREE_H_
